@@ -1,0 +1,55 @@
+[gd_scene load_steps=8 format=2]
+
+[ext_resource path="res://Main.gd" type="Script" id=1]
+[ext_resource path="res://Mob.tscn" type="PackedScene" id=2]
+[ext_resource path="res://Player.tscn" type="PackedScene" id=3]
+[ext_resource path="res://HUD.tscn" type="PackedScene" id=4]
+[ext_resource path="res://assets/house-in-a-forest-loop.ogg" type="AudioStream" id=5]
+[ext_resource path="res://assets/game-over.wav" type="AudioStream" id=6]
+
+[sub_resource type="Curve2D" id=1]
+_data = {
+"points": PoolVector2Array( 0, 0, 0, 0, -4.54553, 0.835571, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2048, 0, 0, 0, 0, 0, 2048, 1200, 0, 0, 0, 0, 0, 1200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -4.54553, 0.835571 )
+}
+
+[node name="Main" type="Node"]
+script = ExtResource( 1 )
+mobs_scene = ExtResource( 2 )
+
+[node name="score_timer" type="Timer" parent="."]
+
+[node name="spawn_timer" type="Timer" parent="."]
+wait_time = 0.5
+
+[node name="ColorRect" type="ColorRect" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color( 0.372549, 0.403922, 0.356863, 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="mob_path" type="Path2D" parent="."]
+curve = SubResource( 1 )
+
+[node name="spawn_point" type="PathFollow2D" parent="mob_path"]
+position = Vector2( -4.54553, 0.835571 )
+rotation = -0.181632
+
+[node name="Player" parent="." instance=ExtResource( 3 )]
+position = Vector2( 1024, 600 )
+
+[node name="HUD" parent="." instance=ExtResource( 4 )]
+
+[node name="Music" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 5 )
+volume_db = -14.0
+autoplay = true
+
+[node name="DeadSound" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 6 )
+[connection signal="timeout" from="score_timer" to="." method="_on_score_timer_timeout"]
+[connection signal="timeout" from="spawn_timer" to="." method="_on_spawn_timer_timeout"]
+[connection signal="hit" from="Player" to="." method="game_over"]
+[connection signal="start_game" from="HUD" to="." method="new_game"]
+[connection signal="finished" from="DeadSound" to="." method="_on_DeadSound_finished"]
